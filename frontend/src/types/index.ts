@@ -175,8 +175,9 @@ export interface FormState<T> {
 export type FormErrors<T> = Partial<Record<keyof T, string>>;
 
 export interface FormValidationRules<T> {
-  [key in keyof T]?: Array<(value: any) => string | undefined>;
+  [key: string]: Array<(value: any) => string | undefined>;
 }
+
 
 // ============ NOTIFICATIONS ============
 export type NotificationType = 'success' | 'error' | 'warning' | 'info';

@@ -10,11 +10,14 @@ import { JWTPayload, TokenResponse } from './types';
  * Generate JWT access token
  */
 export const generateAccessToken = (payload: JWTPayload): string => {
-  const options: SignOptions = {
-    expiresIn: config.JWT_EXPIRE || '24h',
+  const expiresInValue = typeof config.JWT_EXPIRE === 'number' 
+    ? config.JWT_EXPIRE 
+    : (config.JWT_EXPIRE as string) || '24h';
+  
+  return jwt.sign(payload, config.JWT_SECRET as string, {
+    expiresIn: expiresInValue as any,
     algorithm: 'HS256',
-  };
-  return jwt.sign(payload, config.JWT_SECRET as string, options);
+  } as SignOptions);
 };
 
 /**
@@ -77,3 +80,5 @@ export const isTokenExpired = (token: string): boolean => {
   }
   return decoded.exp * 1000 < Date.now();
 };
+
+export { JWTPayload, TokenResponse } from './types';
