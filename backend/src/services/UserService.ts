@@ -13,7 +13,7 @@ export class UserService {
    */
   static async getUserWithProfile(userId: string): Promise<{
     user: Omit<UserProfile, 'password'>;
-    profile?: PatientProfile | ProviderProfile;
+    profile?: PatientProfile | ProviderProfile | undefined;
   } | null> {
     const user = await User.getById(userId);
 

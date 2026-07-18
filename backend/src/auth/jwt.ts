@@ -2,7 +2,7 @@
  * JWT Token Generation and Verification
  */
 
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import { config } from '../config';
 import { JWTPayload, TokenResponse } from './types';
 
@@ -10,20 +10,22 @@ import { JWTPayload, TokenResponse } from './types';
  * Generate JWT access token
  */
 export const generateAccessToken = (payload: JWTPayload): string => {
-  return jwt.sign(payload, config.JWT_SECRET, {
-    expiresIn: config.JWT_EXPIRE,
+  const options: SignOptions = {
+    expiresIn: config.JWT_EXPIRE || '24h',
     algorithm: 'HS256',
-  });
+  };
+  return jwt.sign(payload, config.JWT_SECRET as string, options);
 };
 
 /**
  * Generate JWT refresh token (longer expiry)
  */
 export const generateRefreshToken = (payload: JWTPayload): string => {
-  return jwt.sign(payload, config.JWT_SECRET, {
+  const options: SignOptions = {
     expiresIn: '7d',
     algorithm: 'HS256',
-  });
+  };
+  return jwt.sign(payload, config.JWT_SECRET as string, options);
 };
 
 /**
