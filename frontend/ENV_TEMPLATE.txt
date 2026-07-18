@@ -1,0 +1,11 @@
+# Frontend Environment Variables
+
+NEXT_PUBLIC_API_URL=http://localhost:3001
+NEXT_PUBLIC_AI_SERVICE_URL=http://localhost:8000
+
+# Feature Flags
+NEXT_PUBLIC_ENABLE_AI_RECOMMENDATIONS=true
+NEXT_PUBLIC_ENABLE_TELEHEALTH=false
+
+# Analytics (Optional)
+NEXT_PUBLIC_GA_ID=

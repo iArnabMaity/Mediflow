@@ -1,0 +1,29 @@
+{
+  "name": "mediflow",
+  "version": "1.0.0",
+  "description": "AI Healthcare Navigation & Patient Care Coordination",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend",
+    "ai-service"
+  ],
+  "scripts": {
+    "dev": "bash scripts/dev.sh",
+    "build": "npm run build --workspaces",
+    "start": "npm start --workspaces",
+    "setup": "bash scripts/setup.sh",
+    "db:migrate": "bash scripts/db-migrate.sh",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:build": "docker-compose build"
+  },
+  "keywords": [
+    "healthcare",
+    "patient-care",
+    "ai",
+    "medical-coordination"
+  ],
+  "author": "MediFlow Team",
+  "license": "MIT"
+}

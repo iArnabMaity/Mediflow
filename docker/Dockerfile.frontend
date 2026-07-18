@@ -1,0 +1,37 @@
+# Frontend Dockerfile
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+
+# Copy workspace root files
+COPY package*.json ./
+COPY tsconfig.json ./
+
+# Copy frontend files
+COPY frontend ./frontend
+
+# Install dependencies
+RUN npm install --prefer-offline --no-audit
+
+# Build frontend
+WORKDIR /app/frontend
+RUN npm run build
+
+# Production image
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy built application from builder
+COPY --from=builder /app/frontend/.next ./frontend/.next
+COPY --from=builder /app/frontend/public ./frontend/public
+COPY --from=builder /app/frontend/package*.json ./frontend/
+COPY --from=builder /app/node_modules ./node_modules
+
+WORKDIR /app/frontend
+
+# Expose port
+EXPOSE 3000
+
+# Start application
+CMD ["npm", "start"]

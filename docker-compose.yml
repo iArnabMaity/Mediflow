@@ -1,0 +1,131 @@
+version: "3.9"
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:16-alpine
+    container_name: mediflow-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-mediflow_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mediflow_password}
+      POSTGRES_DB: ${POSTGRES_DB:-mediflow}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-mediflow_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - mediflow-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: mediflow-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - mediflow-network
+
+  # Backend API Server
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    container_name: mediflow-backend
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      DATABASE_URL: postgresql://${POSTGRES_USER:-mediflow_user}:${POSTGRES_PASSWORD:-mediflow_password}@db:5432/${POSTGRES_DB:-mediflow}
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-your-secret-key-here}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/tests:/app/tests
+    networks:
+      - mediflow-network
+    restart: unless-stopped
+
+  # Frontend Application
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+    container_name: mediflow-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:3001
+      NEXT_PUBLIC_AI_SERVICE_URL: http://localhost:8000
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+    networks:
+      - mediflow-network
+    restart: unless-stopped
+
+  # AI Service
+  ai-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.ai
+    container_name: mediflow-ai
+    ports:
+      - "8000:8000"
+    environment:
+      AI_SERVICE_PORT: 8000
+      OLLAMA_URL: http://localhost:11434
+      PYTHONUNBUFFERED: 1
+    volumes:
+      - ./ai-service:/app
+      - ai_models:/app/models_cache
+    networks:
+      - mediflow-network
+    restart: unless-stopped
+
+  # Ollama (Local LLM)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: mediflow-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      OLLAMA_HOST: 0.0.0.0:11434
+    networks:
+      - mediflow-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  ai_models:
+    driver: local
+  ollama_data:
+    driver: local
+
+networks:
+  mediflow-network:
+    driver: bridge

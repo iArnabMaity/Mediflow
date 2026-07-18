@@ -1,0 +1,429 @@
+/* Global Styles & Design System Implementation */
+
+/* ============================================================================
+   FONT IMPORTS
+   ============================================================================ */
+
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap");
+
+/* ============================================================================
+   TAILWIND DIRECTIVES
+   ============================================================================ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================================
+   BASE STYLES & RESETS
+   ============================================================================ */
+
+:root {
+  /* Color tokens */
+  --color-primary: #4d7d8f;
+  --color-primary-light: #6b95a8;
+  --color-primary-dark: #2d4d5f;
+  --color-teal: #10b981;
+  --color-teal-light: #5ffcbe;
+  --color-teal-dark: #047857;
+  --color-success-bg: #e8ffea;
+  --color-success-text: #1ba673;
+  --color-coral: #ff5530;
+  --color-coral-light: #fca5a5;
+  --color-coral-dark: #dc2626;
+  --color-canvas: #ffffff;
+  --color-surface: #f7f8fa;
+  --color-ink: #0a0a0a;
+  --color-charcoal: #222222;
+  --color-slate: #45515e;
+  --color-steel: #5f5f5f;
+  --color-stone: #8e8e93;
+  --color-muted: #a8aab2;
+  --color-hairline: #e5e7eb;
+
+  /* Spacing tokens */
+  --spacing-xxs: 4px;
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 16px;
+  --spacing-lg: 20px;
+  --spacing-xl: 24px;
+  --spacing-xxl: 32px;
+
+  /* Elevation tokens */
+  --elevation-1: rgba(0, 0, 0, 0.04) 0px 1px 2px 0px;
+  --elevation-2: rgba(0, 0, 0, 0.08) 0px 4px 6px 0px;
+  --elevation-3: rgba(0, 0, 0, 0.08) 0px 0px 22px 0px;
+  --elevation-4: rgba(36, 36, 36, 0.08) 0px 12px 16px -4px;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  @apply font-sans text-body-md text-charcoal bg-canvas;
+}
+
+* {
+  @apply box-border;
+}
+
+/* ============================================================================
+   TYPOGRAPHY BASE STYLES
+   ============================================================================ */
+
+h1 {
+  @apply text-hero-display font-bold text-ink;
+}
+
+h2 {
+  @apply text-display-lg font-bold text-ink;
+}
+
+h3 {
+  @apply text-heading-lg font-semibold text-ink;
+}
+
+h4 {
+  @apply text-heading-md font-semibold text-ink;
+}
+
+h5 {
+  @apply text-heading-sm font-semibold text-ink;
+}
+
+h6 {
+  @apply text-card-title font-semibold text-ink;
+}
+
+p {
+  @apply text-body-md leading-relaxed text-charcoal;
+}
+
+small {
+  @apply text-body-sm text-slate;
+}
+
+strong,
+b {
+  @apply font-semibold;
+}
+
+em,
+i {
+  @apply italic;
+}
+
+/* ============================================================================
+   COMPONENT STYLES
+   ============================================================================ */
+
+@layer components {
+  /* Buttons */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-ink text-white text-button-md font-semibold rounded-full hover:bg-charcoal active:bg-slate transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-transparent text-ink border border-ink text-button-md font-semibold rounded-full hover:bg-surface active:bg-hairline transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed;
+  }
+
+  .btn-tertiary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-canvas text-ink border border-hairline text-button-md font-semibold rounded-full hover:bg-surface active:bg-hairline transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-0 py-0 bg-transparent text-ink text-button-md font-semibold hover:opacity-75 transition-all duration-200;
+  }
+
+  /* Cards */
+  .card {
+    @apply bg-canvas rounded-xl border border-hairline p-6 transition-all duration-300;
+  }
+
+  .card-feature {
+    @apply bg-surface rounded-xl p-8 transition-all duration-300;
+  }
+
+  .card-showcase {
+    @apply rounded-hero p-8 text-white transition-all duration-300;
+  }
+
+  .card-showcase-coral {
+    @apply bg-coral;
+  }
+
+  .card-showcase-teal {
+    @apply bg-teal;
+  }
+
+  .card-showcase-magenta {
+    @apply bg-magenta;
+  }
+
+  /* Forms */
+  .form-input {
+    @apply w-full px-4 py-2.5 bg-canvas text-charcoal text-body-sm border border-hairline rounded-md outline-none transition-all duration-200 focus:border-2 focus:border-brand-blue-deep disabled:bg-hairline-soft disabled:cursor-not-allowed;
+  }
+
+  .form-input-error {
+    @apply border-error-text focus:border-error-text;
+  }
+
+  .form-input-success {
+    @apply border-success-text focus:border-success-text;
+  }
+
+  .form-label {
+    @apply block text-body-sm-medium text-ink font-medium mb-2;
+  }
+
+  .form-help-text {
+    @apply block mt-1 text-body-sm text-slate;
+  }
+
+  .form-error-text {
+    @apply block mt-1 text-body-sm text-error-text;
+  }
+
+  /* Badges */
+  .badge {
+    @apply inline-flex items-center gap-2 px-3 py-1.5 text-caption-bold font-semibold rounded-full;
+  }
+
+  .badge-success {
+    @apply bg-success-bg text-success-text;
+  }
+
+  .badge-error {
+    @apply bg-error-bg text-error-text;
+  }
+
+  .badge-warning {
+    @apply bg-warning-bg text-warning-text;
+  }
+
+  .badge-info {
+    @apply bg-info-bg text-info-text;
+  }
+
+  .badge-coral {
+    @apply bg-coral text-white;
+  }
+
+  .badge-teal {
+    @apply bg-teal text-white;
+  }
+
+  /* Tables */
+  .table-base {
+    @apply w-full border-collapse;
+  }
+
+  .table-header {
+    @apply bg-surface text-steel text-caption-bold font-semibold;
+  }
+
+  .table-header-cell {
+    @apply px-4 py-3 text-left border-b border-hairline;
+  }
+
+  .table-row {
+    @apply border-b border-hairline-soft hover:bg-surface transition-colors;
+  }
+
+  .table-cell {
+    @apply px-4 py-3 text-body-sm text-charcoal;
+  }
+
+  /* Navigation */
+  .nav-link {
+    @apply text-body-sm text-charcoal hover:text-ink transition-colors duration-200;
+  }
+
+  .nav-link-active {
+    @apply text-ink font-semibold;
+  }
+
+  /* Sidebar */
+  .sidebar-item {
+    @apply flex items-center gap-3 px-4 py-2 text-body-sm text-charcoal rounded-md hover:bg-surface transition-colors;
+  }
+
+  .sidebar-item-active {
+    @apply bg-surface text-ink font-medium;
+  }
+}
+
+/* ============================================================================
+   LINK STYLES
+   ============================================================================ */
+
+a {
+  @apply text-brand-blue-deep hover:text-brand-blue-700 transition-colors duration-200;
+}
+
+a:visited {
+  @apply text-brand-blue-700;
+}
+
+/* ============================================================================
+   RESPONSIVE UTILITIES
+   ============================================================================ */
+
+@media (max-width: 480px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+@media (min-width: 1024px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+/* ============================================================================
+   SCROLLBAR STYLES
+   ============================================================================ */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-hairline);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-steel);
+}
+
+/* ============================================================================
+   SELECTION STYLES
+   ============================================================================ */
+
+::selection {
+  @apply bg-teal text-white;
+}
+
+::-moz-selection {
+  @apply bg-teal text-white;
+}
+
+/* ============================================================================
+   FOCUS STYLES (ACCESSIBILITY)
+   ============================================================================ */
+
+:focus-visible {
+  @apply outline-2 outline-offset-2 outline-brand-blue-deep;
+}
+
+/* ============================================================================
+   UTILITY CLASSES
+   ============================================================================ */
+
+.container-max {
+  @apply max-w-7xl mx-auto;
+}
+
+.container-prose {
+  @apply max-w-4xl mx-auto;
+}
+
+.flex-center {
+  @apply flex items-center justify-center;
+}
+
+.grid-center {
+  @apply grid place-items-center;
+}
+
+.text-truncate {
+  @apply truncate;
+}
+
+.text-ellipsis {
+  @apply overflow-hidden text-ellipsis;
+}
+
+.line-clamp-2 {
+  @apply overflow-hidden text-ellipsis line-clamp-2;
+}
+
+.line-clamp-3 {
+  @apply overflow-hidden text-ellipsis line-clamp-3;
+}
+
+.transition-all {
+  @apply transition-all duration-200;
+}
+
+.shadow-lg {
+  @apply shadow-elevation-4;
+}
+
+/* ============================================================================
+   ANIMATION UTILITIES
+   ============================================================================ */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.animate-slide-in-up {
+  animation: slideInUp 0.3s ease-in-out;
+}
+
+/* ============================================================================
+   PRINT STYLES
+   ============================================================================ */
+
+@media print {
+  body {
+    @apply bg-white;
+  }
+
+  .no-print {
+    @apply hidden;
+  }
+
+  a {
+    @apply underline;
+  }
+}
