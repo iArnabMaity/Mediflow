@@ -5,8 +5,9 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { useNotification } from '@/context/NotificationContext';
+import { useNotificationContext } from '@/context/NotificationContext';
 import { NOTIFICATION_DURATION_MS } from '@/constants';
+import { Notification } from '@/types';
 
 interface ToastProps {
   id: string;
@@ -156,12 +157,12 @@ const ToastItem: React.FC<ToastProps> = ({ id, message, type, onClose }) => {
  * Toast Container Component
  */
 const Toast: React.FC = () => {
-  const { notifications, removeNotification } = useNotification();
+  const { notifications, removeNotification } = useNotificationContext();
 
   return (
     <div className="fixed top-0 right-0 z-50 pointer-events-none">
       <div className="fixed top-4 right-4 pointer-events-auto space-y-3">
-        {notifications.map((notification) => (
+        {notifications.map((notification: Notification) => (
           <ToastItem
             key={notification.id}
             id={notification.id}

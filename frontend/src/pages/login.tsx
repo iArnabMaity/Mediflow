@@ -19,20 +19,9 @@ interface LoginFormData {
   rememberMe: boolean;
 }
 
-const loginValidationSchema = {
-  email: {
-    required: true,
-    pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-  },
-  password: {
-    required: true,
-    minLength: 6,
-  },
-};
-
 export default function LoginPage() {
   const router = useRouter();
-  const { showNotification } = useNotification();
+  const { success, error } = useNotification();
   const [isAttempting, setIsAttempting] = useState(false);
 
   const { login, isLoading } = useAuthStore((state) => ({
@@ -40,13 +29,46 @@ export default function LoginPage() {
     isLoading: state.isLoading,
   }));
 
-  const { formData, errors, setFormData, validateForm } = useForm<LoginFormData>(
+  const { values, errors, handleChange, handleSubmit: onFormSubmit } = useForm<LoginFormData>(
     {
-      email: "",
-      password: "",
-      rememberMe: false,
-    },
-    loginValidationSchema
+      initialValues: {
+        email: "",
+        password: "",
+        rememberMe: false,
+      },
+      onSubmit: async (formValues) => {
+        try {
+          setIsAttempting(true);
+          await login({
+            email: formValues.email,
+            password: formValues.password,
+          });
+
+          success("Logged in successfully!");
+          router.push("/dashboard");
+        } catch (error: any) {
+          console.error("Login error:", error);
+          const errorMessage =
+            error.response?.data?.message ||
+            error.message ||
+            "Login failed. Please check your credentials and try again.";
+          error(errorMessage);
+        } finally {
+          setIsAttempting(false);
+        }
+      },
+      validate: {
+        email: [
+          (value: any) => !value ? "Email is required" : undefined,
+          (value: any) => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? "Invalid email format" : undefined,
+        ],
+        password: [
+          (value: any) => !value ? "Password is required" : undefined,
+          (value: any) => value.length < 6 ? "Password must be at least 6 characters" : undefined,
+        ],
+        rememberMe: [],
+      },
+    }
   );
 
   // Redirect if already authenticated
@@ -60,49 +82,17 @@ export default function LoginPage() {
     checkAuth();
   }, [router]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === "checkbox" ? checked : value,
-    });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      showNotification("Please fix the errors in the form", "error");
-      return;
-    }
-
-    try {
-      setIsAttempting(true);
-      await login({
-        email: formData.email,
-        password: formData.password,
-      });
-
-      showNotification("Logged in successfully!", "success");
-      router.push("/dashboard");
-    } catch (error: any) {
-      console.error("Login error:", error);
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "Login failed. Please check your credentials and try again.";
-      showNotification(errorMessage, "error");
-    } finally {
-      setIsAttempting(false);
-    }
-  };
-
   const handleForgotPassword = () => {
     router.push("/forgot-password");
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await onFormSubmit(e as any);
+  };
+
   const isSubmitting = isLoading || isAttempting;
-  const isFormValid = formData.email && formData.password && !isSubmitting;
+  const isFormValid = values.email && values.password && !isSubmitting;
 
   return (
     <AuthLayout
@@ -119,7 +109,7 @@ export default function LoginPage() {
             type="email"
             name="email"
             placeholder="your@email.com"
-            value={formData.email}
+            value={values.email}
             onChange={handleChange}
             disabled={isSubmitting}
           />
@@ -146,7 +136,7 @@ export default function LoginPage() {
             type="password"
             name="password"
             placeholder="Enter your password"
-            value={formData.password}
+            value={values.password}
             onChange={handleChange}
             disabled={isSubmitting}
           />
@@ -161,7 +151,7 @@ export default function LoginPage() {
             type="checkbox"
             id="rememberMe"
             name="rememberMe"
-            checked={formData.rememberMe}
+            checked={values.rememberMe}
             onChange={handleChange}
             disabled={isSubmitting}
             className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
@@ -239,4 +229,3 @@ export default function LoginPage() {
     </AuthLayout>
   );
 }
-

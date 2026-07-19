@@ -20,7 +20,9 @@ interface AuthState {
   updateUser: (user: User) => void;
   setError: (error: string | null) => void;
   clearError: () => void;
+  checkAuth: () => Promise<boolean>;
 }
+
 
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
@@ -122,6 +124,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   clearError: () => {
     set({ error: null });
   },
+
+  checkAuth: async () => {
+    const state = get();
+    return state.isAuthenticated;
+  },
+
 }));
 
 export default useAuthStore;

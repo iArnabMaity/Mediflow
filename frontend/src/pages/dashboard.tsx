@@ -6,7 +6,9 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import DashboardLayout from "@/layouts/DashboardLayout";
-import { Card, CardTitle, CardHeader, CardBody, Loading } from "@/components/Card";
+import Card, { CardTitle, CardHeader, CardBody } from "@/components/Card";
+import Loading from "@/components/Loading";
+
 import Button from "@/components/Button";
 import Badge from "@/components/Badge";
 import { useAuth } from "@/hooks/useAuth";
@@ -86,7 +88,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <DashboardLayout userName={user?.firstName || "User"} userRole={user?.role || "patient"}>
+    <DashboardLayout userName={user?.firstName || "User"} userRole={(user?.role === 'doctor' ? 'provider' : user?.role) || "patient"}>
       {/* Welcome Section */}
       <div className="mb-8">
         <h1 className="text-heading-lg font-bold text-ink mb-2">

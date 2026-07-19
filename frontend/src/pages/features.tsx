@@ -6,7 +6,7 @@
 import React from "react";
 import HomeLayout from "@/layouts/HomeLayout";
 import Button from "@/components/Button";
-import { Card, CardTitle, CardDescription } from "@/components/Card";
+import Card, { CardTitle, CardDescription } from "@/components/Card";
 import Badge from "@/components/Badge";
 
 export default function FeaturesPage() {

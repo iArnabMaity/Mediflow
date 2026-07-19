@@ -7,13 +7,18 @@ export type UserRole = 'patient' | 'doctor' | 'admin' | 'provider';
 export interface User {
   id: string;
   name: string;
+  firstName?: string;
+  lastName?: string;
   email: string;
   phone?: string;
   role: UserRole;
   avatar?: string;
   createdAt: string;
   updatedAt: string;
+  data?: Record<string, any>;
 }
+
+
 
 export interface Patient extends User {
   role: 'patient';

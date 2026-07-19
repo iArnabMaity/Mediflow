@@ -251,12 +251,12 @@ interface BreadcrumbItem {
   href?: string;
 }
 
-interface BreadcrumbProps extends React.HTMLAttributes<HTMLNavElement> {
+interface BreadcrumbProps extends React.HTMLAttributes<HTMLElement> {
   items: BreadcrumbItem[];
   onNavigate?: (href: string) => void;
 }
 
-const Breadcrumb = React.forwardRef<HTMLNavElement, BreadcrumbProps>(
+const Breadcrumb = React.forwardRef<HTMLElement, BreadcrumbProps>(
   (
     { items, onNavigate, className = "", ...props },
     ref
@@ -274,7 +274,7 @@ const Breadcrumb = React.forwardRef<HTMLNavElement, BreadcrumbProps>(
             {item.href ? (
               <a
                 href={item.href}
-                onClick={() => onNavigate?.(item.href)}
+                onClick={() => item.href && onNavigate?.(item.href)}
                 className="text-brand-blue-deep hover:text-brand-blue-700 transition-colors"
               >
                 {item.label}
@@ -293,6 +293,7 @@ Breadcrumb.displayName = "Breadcrumb";
 
 export default Sidebar;
 export {
+  Sidebar,
   SidebarNavItem,
   SidebarSection,
   TocItem,

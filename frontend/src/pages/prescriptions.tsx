@@ -6,7 +6,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import DashboardLayout from '@/layouts/DashboardLayout';
-import { Card, CardHeader, CardBody } from '@/components/Card';
+import Card, { CardHeader, CardBody } from '@/components/Card';
 import Button from '@/components/Button';
 import Badge from '@/components/Badge';
 import { useAuth } from '@/hooks/useAuth';

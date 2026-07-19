@@ -6,7 +6,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import DashboardLayout from "@/layouts/DashboardLayout";
-import { Card } from "@/components/Card";
+import Card from "@/components/Card";
 import Button from "@/components/Button";
 import { SearchPill } from "@/components/Input";
 import Badge from "@/components/Badge";

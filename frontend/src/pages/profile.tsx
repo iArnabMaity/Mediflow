@@ -6,7 +6,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import DashboardLayout from "@/layouts/DashboardLayout";
-import { Card, CardHeader, CardBody, CardFooter, CardTitle } from "@/components/Card";
+import Card, { CardHeader, CardBody, CardFooter, CardTitle } from "@/components/Card";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
 import Badge from "@/components/Badge";
@@ -48,7 +48,7 @@ const profileValidationSchema = {
 export default function PatientProfilePage() {
   const router = useRouter();
   const { isAuthenticated, user } = useAuth();
-  const { showNotification } = useNotification();
+  const { success, error } = useNotification();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -61,13 +61,14 @@ export default function PatientProfilePage() {
   });
 
   const {
-    formData,
+    values: formData,
     errors,
-    setFormData,
-    validateForm,
+    setValues: setFormData,
+    handleChange,
+    handleSubmit: onFormSubmit,
     resetForm,
-  } = useForm<ProfileFormData>(
-    {
+  } = useForm<ProfileFormData>({
+    initialValues: {
       firstName: "",
       lastName: "",
       email: "",
@@ -78,8 +79,28 @@ export default function PatientProfilePage() {
       allergies: "",
       medicalHistory: "",
     },
-    profileValidationSchema
-  );
+    onSubmit: async (values) => {
+      try {
+        await userService.updateProfile(values);
+        success("Profile updated successfully");
+        setIsEditing(false);
+      } catch (err) {
+        console.error("Failed to save profile:", err);
+        error("Failed to save profile");
+      }
+    },
+    validate: {
+      firstName: [(value: any) => !value || value.length < 2 ? "First name must be at least 2 characters" : undefined],
+      lastName: [(value: any) => !value || value.length < 2 ? "Last name must be at least 2 characters" : undefined],
+      email: [(value: any) => !value ? "Email is required" : undefined, (value: any) => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? "Invalid email format" : undefined],
+      phone: [(value: any) => !value ? "Phone is required" : undefined, (value: any) => !/^[+]?[\d\s-()]+$/.test(value) ? "Invalid phone format" : undefined],
+      dateOfBirth: [(value: any) => !value ? "Date of birth is required" : undefined],
+      gender: [(value: any) => !value ? "Gender is required" : undefined],
+      bloodType: [(value: any) => !value ? "Blood type is required" : undefined],
+      allergies: [],
+      medicalHistory: [],
+    },
+  });
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -96,22 +117,24 @@ export default function PatientProfilePage() {
         const response = await userService.getProfile();
         const profile = response.data;
 
-        setFormData({
-          firstName: profile.firstName || "",
-          lastName: profile.lastName || "",
-          email: profile.email || "",
-          phone: profile.phone || "",
-          dateOfBirth: profile.dateOfBirth || "",
-          gender: profile.gender || "",
-          bloodType: profile.bloodType || "",
-          allergies: profile.allergies || "",
-          medicalHistory: profile.medicalHistory || "",
-        });
+        if (profile) {
+          setFormData({
+            firstName: profile.firstName || "",
+            lastName: profile.lastName || "",
+            email: profile.email || "",
+            phone: profile.phone || "",
+            dateOfBirth: profile.dateOfBirth || "",
+            gender: profile.gender || "",
+            bloodType: profile.bloodType || "",
+            allergies: profile.allergies || "",
+            medicalHistory: profile.medicalHistory || "",
+          });
 
-        setEmergencyContacts(profile.emergencyContacts || []);
-      } catch (error) {
-        console.error("Failed to fetch profile:", error);
-        showNotification("Failed to load profile", "error");
+          setEmergencyContacts(profile.emergencyContacts || []);
+        }
+      } catch (errorFromFetch) {
+        console.error("Failed to fetch profile:", errorFromFetch);
+        error("Failed to load profile");
       } finally {
         setIsLoading(false);
       }
@@ -132,26 +155,9 @@ export default function PatientProfilePage() {
     });
   };
 
-  const handleSave = async () => {
-    if (!validateForm()) {
-      showNotification("Please fix the errors in the form", "error");
-      return;
-    }
-
-    try {
-      setIsSaving(true);
-      await userService.updateProfile({
-        ...formData,
-        emergencyContacts,
-      });
-      showNotification("Profile updated successfully", "success");
-      setIsEditing(false);
-    } catch (error) {
-      console.error("Failed to save profile:", error);
-      showNotification("Failed to save profile", "error");
-    } finally {
-      setIsSaving(false);
-    }
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await onFormSubmit(e as any);
   };
 
   const handleCancel = () => {
@@ -165,19 +171,19 @@ export default function PatientProfilePage() {
       !newContact.relationship.trim() ||
       !newContact.phone.trim()
     ) {
-      showNotification("Please fill in all contact fields", "error");
+      error("Please fill in all contact fields");
       return;
     }
 
     setEmergencyContacts([...emergencyContacts, newContact]);
     setNewContact({ name: "", relationship: "", phone: "" });
     setShowAddContact(false);
-    showNotification("Emergency contact added", "success");
+    success("Emergency contact added");
   };
 
   const handleRemoveContact = (index: number) => {
     setEmergencyContacts(emergencyContacts.filter((_, i) => i !== index));
-    showNotification("Emergency contact removed", "success");
+    success("Emergency contact removed");
   };
 
   if (!isAuthenticated) {

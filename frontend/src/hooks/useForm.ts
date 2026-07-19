@@ -46,9 +46,9 @@ export const useForm = <T extends Record<string, any>, >(
 
   const validateField = useCallback(
     (field: keyof T, value: any): string | undefined => {
-      if (!validate || !validate[field]) return undefined;
-
-      const fieldValidators = validate[field];
+      if (!validate) return undefined;
+      
+      const fieldValidators = validate[field as string] as Array<(value: any) => string | undefined> | undefined;
       if (!fieldValidators) return undefined;
 
       for (const validator of fieldValidators) {
@@ -59,6 +59,7 @@ export const useForm = <T extends Record<string, any>, >(
     },
     [validate]
   );
+
 
   const validateAllFields = useCallback((): FormErrors<T> => {
     const newErrors: FormErrors<T> = {};

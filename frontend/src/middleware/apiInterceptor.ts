@@ -29,7 +29,7 @@ const processQueue = (
 export const setupApiInterceptors = () => {
   // Request interceptor - add token to headers
   apiClient.interceptors.request.use(
-    (config: AxiosRequestConfig) => {
+    (config) => {
       const token = getFromLocalStorage<string>(STORAGE_KEYS.AUTH_TOKEN);
       if (token) {
         config.headers = config.headers || {};
@@ -44,7 +44,7 @@ export const setupApiInterceptors = () => {
   apiClient.interceptors.response.use(
     (response) => response,
     async (error: AxiosError) => {
-      const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
+      const originalRequest = error.config as any;
 
       if (error.response?.status === 401 && !originalRequest._retry) {
         if (isRefreshing) {
@@ -103,5 +103,6 @@ export const setupApiInterceptors = () => {
     }
   );
 };
+
 
 export default setupApiInterceptors;

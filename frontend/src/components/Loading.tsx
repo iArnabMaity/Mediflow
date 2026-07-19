@@ -151,7 +151,7 @@ export const TableSkeleton: React.FC<TableSkeletonProps> = ({ columns = 4, rows 
  */
 interface LoadingProps {
   isLoading?: boolean;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   skeleton?: 'card' | 'table' | 'custom';
   skeletonProps?: any;
   fallback?: React.ReactNode;
@@ -178,7 +178,7 @@ export const Loading: React.FC<LoadingProps> = ({
     }
   }
 
-  return <>{children}</>;
+  return children ? <>{children}</> : <PageLoading />;
 };
 
 export default Loading;

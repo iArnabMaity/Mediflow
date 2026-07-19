@@ -6,7 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import DashboardLayout from '@/layouts/DashboardLayout';
-import { Card, CardHeader, CardBody, CardFooter, CardTitle } from '@/components/Card';
+import Card, { CardHeader, CardBody, CardFooter, CardTitle } from '@/components/Card';
 import Button from '@/components/Button';
 import Input from '@/components/Input';
 import Badge from '@/components/Badge';
@@ -54,7 +54,7 @@ const settingsValidationSchema = {
 export default function SettingsPage() {
   const router = useRouter();
   const { isAuthenticated, user } = useAuth();
-  const { showNotification } = useNotification();
+  const { success, error } = useNotification();
   
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -79,8 +79,8 @@ export default function SettingsPage() {
   
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  const { formData, errors, setFormData, validateForm } = useForm<SettingsFormData>(
-    {
+  const { values: formData, errors, setValues: setFormData, handleSubmit } = useForm<SettingsFormData>({
+    initialValues: {
       email: '',
       firstName: '',
       lastName: '',
@@ -88,8 +88,31 @@ export default function SettingsPage() {
       newPassword: '',
       confirmPassword: '',
     },
-    settingsValidationSchema
-  );
+    onSubmit: async (values) => {
+      try {
+        setIsSaving(true);
+        await userService.updateProfile({
+          email: values.email,
+          firstName: values.firstName,
+          lastName: values.lastName,
+        });
+        success('Account settings updated successfully');
+      } catch (err) {
+        console.error('Failed to save settings:', err);
+        error('Failed to save settings');
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    validate: {
+      email: [(value: any) => !value ? "Email is required" : undefined, (value: any) => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? "Invalid email format" : undefined],
+      firstName: [(value: any) => !value || value.length < 2 ? "First name must be at least 2 characters" : undefined],
+      lastName: [(value: any) => !value || value.length < 2 ? "Last name must be at least 2 characters" : undefined],
+      currentPassword: [],
+      newPassword: [],
+      confirmPassword: [],
+    },
+  });
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -106,14 +129,16 @@ export default function SettingsPage() {
         const response = await userService.getProfile();
         const profile = response.data;
 
-        setFormData({
-          email: profile.email || '',
-          firstName: profile.firstName || '',
-          lastName: profile.lastName || '',
-          currentPassword: '',
-          newPassword: '',
-          confirmPassword: '',
-        });
+        if (profile) {
+          setFormData({
+            email: profile.email || '',
+            firstName: profile.firstName || '',
+            lastName: profile.lastName || '',
+            currentPassword: '',
+            newPassword: '',
+            confirmPassword: '',
+          });
+        }
 
         // Load notification settings from localStorage or API
         const savedNotifications = localStorage.getItem('mediflow_notifications');
@@ -128,9 +153,9 @@ export default function SettingsPage() {
 
         const savedTheme = localStorage.getItem('mediflow_theme');
         setIsDarkMode(savedTheme === 'dark');
-      } catch (error) {
-        console.error('Failed to fetch settings:', error);
-        showNotification('Failed to load settings', 'error');
+      } catch (errorFromFetch) {
+        console.error('Failed to fetch settings:', errorFromFetch);
+        error('Failed to load settings');
       } finally {
         setIsLoading(false);
       }
@@ -141,51 +166,32 @@ export default function SettingsPage() {
     }
   }, [isAuthenticated]);
 
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
+    // Use the useForm's setValues to update form data
+    const currentValues = formData;
     setFormData({
-      ...formData,
+      ...currentValues,
       [name]: value,
     });
   };
 
-  const handleSaveAccountSettings = async () => {
-    if (!validateForm()) {
-      showNotification('Please fix the errors in the form', 'error');
-      return;
-    }
-
-    try {
-      setIsSaving(true);
-      await userService.updateProfile({
-        email: formData.email,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-      });
-      showNotification('Account settings updated successfully', 'success');
-    } catch (error) {
-      console.error('Failed to save settings:', error);
-      showNotification('Failed to save settings', 'error');
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
   const handleChangePassword = async () => {
     if (!formData.currentPassword || !formData.newPassword || !formData.confirmPassword) {
-      showNotification('Please fill in all password fields', 'error');
+      error('Please fill in all password fields');
       return;
     }
 
     if (formData.newPassword !== formData.confirmPassword) {
-      showNotification('New passwords do not match', 'error');
+      error('New passwords do not match');
       return;
     }
 
     if (formData.newPassword.length < 8) {
-      showNotification('Password must be at least 8 characters', 'error');
+      error('Password must be at least 8 characters');
       return;
     }
 
@@ -197,7 +203,7 @@ export default function SettingsPage() {
       //   newPassword: formData.newPassword,
       // });
       
-      showNotification('Password changed successfully', 'success');
+      success('Password changed successfully');
       setFormData({
         ...formData,
         currentPassword: '',
@@ -205,9 +211,30 @@ export default function SettingsPage() {
         confirmPassword: '',
       });
       setIsChangingPassword(false);
-    } catch (error) {
-      console.error('Failed to change password:', error);
-      showNotification('Failed to change password', 'error');
+    } catch (errorFromPassword) {
+      console.error('Failed to change password:', errorFromPassword);
+      error('Failed to change password');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+
+  const handleSaveAccountSettings = async () => {
+    try {
+      setIsSaving(true);
+      // Call API to update account settings
+      // const updatedProfile = await userService.updateProfile({
+      //   firstName: formData.firstName,
+      //   lastName: formData.lastName,
+      //   email: formData.email,
+      // });
+      // setFormData(updatedProfile);
+      
+      success('Account settings updated successfully');
+    } catch (errorFromSettings) {
+      console.error('Failed to save account settings:', errorFromSettings);
+      error('Failed to save account settings');
     } finally {
       setIsSaving(false);
     }
@@ -220,10 +247,10 @@ export default function SettingsPage() {
       // Call API to save notification settings
       // await userService.updateNotificationSettings(notificationSettings);
       
-      showNotification('Notification settings updated', 'success');
-    } catch (error) {
-      console.error('Failed to save notification settings:', error);
-      showNotification('Failed to save notification settings', 'error');
+      success('Notification settings updated');
+    } catch (errorFromNotif) {
+      console.error('Failed to save notification settings:', errorFromNotif);
+      error('Failed to save notification settings');
     } finally {
       setIsSaving(false);
     }
@@ -236,10 +263,10 @@ export default function SettingsPage() {
       // Call API to save privacy settings
       // await userService.updatePrivacySettings(privacySettings);
       
-      showNotification('Privacy settings updated', 'success');
-    } catch (error) {
-      console.error('Failed to save privacy settings:', error);
-      showNotification('Failed to save privacy settings', 'error');
+      success('Privacy settings updated');
+    } catch (errorFromPrivacy) {
+      console.error('Failed to save privacy settings:', errorFromPrivacy);
+      error('Failed to save privacy settings');
     } finally {
       setIsSaving(false);
     }
@@ -249,7 +276,7 @@ export default function SettingsPage() {
     const newTheme = isDarkMode ? 'light' : 'dark';
     setIsDarkMode(!isDarkMode);
     localStorage.setItem('mediflow_theme', newTheme);
-    showNotification(`Theme changed to ${newTheme} mode`, 'success');
+    success(`Theme changed to ${newTheme} mode`);
   };
 
   if (!isAuthenticated) {

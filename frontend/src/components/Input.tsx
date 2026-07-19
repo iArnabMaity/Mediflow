@@ -9,7 +9,7 @@ import { colors, borderRadius } from "../design/tokens";
 type InputVariant = "text" | "email" | "password" | "search" | "number" | "tel";
 type InputSize = "sm" | "md" | "lg";
 
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   variant?: InputVariant;
   size?: InputSize;
   label?: string;

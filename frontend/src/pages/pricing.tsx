@@ -6,7 +6,7 @@
 import React, { useState } from "react";
 import HomeLayout from "@/layouts/HomeLayout";
 import Button from "@/components/Button";
-import { Card, CardTitle } from "@/components/Card";
+import Card, { CardTitle } from "@/components/Card";
 import Badge from "@/components/Badge";
 
 export default function PricingPage() {
@@ -207,7 +207,7 @@ export default function PricingPage() {
                             </span>
                           )}
                         </div>
-                        {plan.price > 0 && (
+                        {plan.price > 0 && typeof plan.yearlyPrice === "number" && (
                           <p className="text-body-sm text-slate mt-1">
                             ${(isAnnual ? plan.yearlyPrice / 12 : plan.price).toFixed(2)}/month billed
                             {isAnnual ? " annually" : " monthly"}

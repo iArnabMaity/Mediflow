@@ -7,7 +7,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import HomeLayout from '@/layouts/HomeLayout';
-import { Card, CardBody } from '@/components/Card';
+import Card, { CardBody } from '@/components/Card';
 import Input from '@/components/Input';
 import Button from '@/components/Button';
 

@@ -74,7 +74,10 @@ export const useNotification = () => {
       addNotification({ type: 'warning', message, title }),
     info: (message: string, title?: string) =>
       addNotification({ type: 'info', message, title }),
+    showNotification: (message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info', title?: string) =>
+      addNotification({ type, message, title }),
   };
 };
+
 
 export default NotificationContext;

@@ -8,12 +8,12 @@ import { useRouter } from "next/router";
 import AuthLayout from "@/layouts/AuthLayout";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
-import { useNotification } from "@/context/NotificationContext";
+import { useNotificationContext } from "@/context/NotificationContext";
 import { validateEmail, validatePassword } from "@/utils/helpers";
 
 export default function SignupPage() {
   const router = useRouter();
-  const { showNotification } = useNotification();
+  const { addNotification } = useNotificationContext();
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -41,27 +41,27 @@ export default function SignupPage() {
 
   const validateForm = (): boolean => {
     if (!formData.firstName.trim()) {
-      showNotification("First name is required", "error");
+      addNotification({ type: "error", message: "First name is required" });
       return false;
     }
     if (!formData.lastName.trim()) {
-      showNotification("Last name is required", "error");
+      addNotification({ type: "error", message: "Last name is required" });
       return false;
     }
     if (!validateEmail(formData.email)) {
-      showNotification("Valid email is required", "error");
+      addNotification({ type: "error", message: "Valid email is required" });
       return false;
     }
     if (!validatePassword(formData.password)) {
-      showNotification("Password must be at least 8 characters", "error");
+      addNotification({ type: "error", message: "Password must be at least 8 characters" });
       return false;
     }
     if (formData.password !== formData.confirmPassword) {
-      showNotification("Passwords do not match", "error");
+      addNotification({ type: "error", message: "Passwords do not match" });
       return false;
     }
     if (!formData.agreeToTerms) {
-      showNotification("You must agree to terms and conditions", "error");
+      addNotification({ type: "error", message: "You must agree to terms and conditions" });
       return false;
     }
     return true;
@@ -75,10 +75,10 @@ export default function SignupPage() {
     try {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      showNotification("Account created successfully!", "success");
+      addNotification({ type: "success", message: "Account created successfully!" });
       router.push("/login");
     } catch (error) {
-      showNotification("Failed to create account", "error");
+      addNotification({ type: "error", message: "Failed to create account" });
     } finally {
       setIsLoading(false);
     }

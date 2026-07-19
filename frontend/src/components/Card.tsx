@@ -95,13 +95,21 @@ Card.displayName = "Card";
 
 // Sub-component for Card Content
 interface CardHeaderProps {
-  children: ReactNode;
+  children?: ReactNode;
   className?: string;
+  title?: string | ReactNode;
 }
 
-const CardHeader: React.FC<CardHeaderProps> = ({ children, className = "" }) => (
-  <div className={`mb-4 pb-4 border-b border-hairline ${className}`}>{children}</div>
+const CardHeader: React.FC<CardHeaderProps> = ({ children, className = "", title }) => (
+  <div className={`mb-4 pb-4 border-b border-hairline ${className}`}>
+    {title ? (
+      typeof title === 'string' ? <h3 className="font-semibold text-gray-900">{title}</h3> : title
+    ) : (
+      children
+    )}
+  </div>
 );
+
 
 // Sub-component for Card Body
 interface CardBodyProps {

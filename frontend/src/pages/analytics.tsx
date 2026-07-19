@@ -7,7 +7,8 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import DashboardLayout from '@/layouts/DashboardLayout';
-import { Card, CardHeader, CardBody } from '@/components/Card';
+import Card from '@/components/Card';
+import { CardHeader, CardBody } from '@/components/Card';
 import Badge from '@/components/Badge';
 import { useAuth } from '@/hooks/useAuth';
 import Loading from '@/components/Loading';

@@ -8,11 +8,21 @@ import React, { useEffect } from 'react';
 import type { AppProps } from 'next/app';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import NProgress from 'nprogress';
+
+// Optional NProgress for route transitions
+let NProgress: any = null;
+if (typeof window !== 'undefined') {
+  try {
+    NProgress = require('nprogress');
+    require('nprogress/nprogress.css');
+  } catch (e) {
+    // NProgress not installed, will skip progress bar
+  }
+}
 
 // Styles
 import '@/styles/globals.css';
-import 'nprogress/nprogress.css';
+
 
 // Contexts
 import { AuthProvider } from '@/context/AuthContext';
@@ -39,7 +49,9 @@ type AppPropsWithLayout = AppProps & {
 };
 
 // NProgress configuration
-NProgress.configure({ showSpinner: false, speed: 400, easing: 'ease', trickleSpeed: 200 });
+if (NProgress) {
+  NProgress.configure({ showSpinner: false, speed: 400, easing: 'ease', trickleSpeed: 200 });
+}
 
 export default function App({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter();
@@ -50,8 +62,10 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
     initializeAuth();
   }, [initializeAuth]);
 
-  // Setup NProgress for route transitions
+  // Setup NProgress for route transitions if available
   useEffect(() => {
+    if (!NProgress) return;
+    
     const handleStart = () => NProgress.start();
     const handleStop = () => NProgress.done();
 

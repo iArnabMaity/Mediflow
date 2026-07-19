@@ -6,12 +6,12 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import DashboardLayout from "@/layouts/DashboardLayout";
-import { Card } from "@/components/Card";
+import Card from "@/components/Card";
 import Button from "@/components/Button";
 import { SearchPill } from "@/components/Input";
 import Badge from "@/components/Badge";
 import { useAuth } from "@/hooks/useAuth";
-import { useNotification } from "@/context/NotificationContext";
+import { useNotificationContext } from "@/context/NotificationContext";
 import { formatDate } from "@/utils/helpers";
 import Loading from "@/components/Loading";
 
@@ -30,7 +30,7 @@ interface MedicalRecord {
 export default function MedicalRecordsPage() {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
-  const { showNotification } = useNotification();
+  const { addNotification } = useNotificationContext();
 
   const [filterType, setFilterType] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -88,12 +88,12 @@ export default function MedicalRecordsPage() {
 
   const handleUpload = () => {
     setIsUploading(true);
-    showNotification("Upload feature coming soon!", "info");
+    addNotification({ type: "info", message: "Upload feature coming soon!" });
     setIsUploading(false);
   };
 
   const handleDownload = (recordId: string, title: string) => {
-    showNotification(`Downloading ${title}...`, "success");
+    addNotification({ type: "success", message: `Downloading ${title}...` });
   };
 
   const getTypeColor = (type: string) => {
